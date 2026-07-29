@@ -8,16 +8,24 @@ public class EstacionamentoService
 {
     private readonly Estacionamento estacionamento;
     private readonly List<Veiculo> veiculos;
+
     private readonly PagamentoService pagamentoService;
+    private readonly TicketService ticketService;
+    private readonly RelatorioService relatorioService;
 
-    public EstacionamentoService(Estacionamento estacionamento)
-    {
-        this.estacionamento = estacionamento;
+   public EstacionamentoService(
+    Estacionamento estacionamento,
+    PagamentoService pagamentoService,
+    TicketService ticketService,
+    RelatorioService relatorioService)
+{
+    this.estacionamento = estacionamento;
+    this.pagamentoService = pagamentoService;
+    this.ticketService = ticketService;
+    this.relatorioService = relatorioService;
 
-        pagamentoService = new PagamentoService();
-
-        veiculos = new List<Veiculo>();
-    }
+    veiculos = new List<Veiculo>();
+}
 
     public void AdicionarVeiculo()
     {
@@ -33,9 +41,10 @@ public class EstacionamentoService
 
         veiculos.Add(veiculo);
 
-        Console.WriteLine("\nVeículo cadastrado com sucesso!");
-        Console.WriteLine($"Placa: {veiculo.Placa}");
-        Console.WriteLine($"Entrada: {veiculo.Entrada:dd/MM/yyyy HH:mm:ss}");
+        Console.WriteLine();
+        Console.WriteLine("Veículo cadastrado com sucesso!");
+        Console.WriteLine($"Placa   : {veiculo.Placa}");
+        Console.WriteLine($"Entrada : {veiculo.Entrada:dd/MM/yyyy HH:mm:ss}");
     }
 
     public void RemoverVeiculo()
@@ -55,13 +64,17 @@ public class EstacionamentoService
             estacionamento.PrecoHora,
             veiculo.Entrada);
 
-        TimeSpan tempo = DateTime.Now - veiculo.Entrada;
+        DateTime saida = DateTime.Now;
+
+        Ticket ticket = ticketService.GerarTicket(
+            veiculo.Placa,
+            veiculo.Entrada,
+            saida,
+            valor);
 
         veiculos.Remove(veiculo);
 
-        Console.WriteLine("\nVeículo removido com sucesso!");
-        Console.WriteLine($"Tempo estacionado: {tempo:hh\\:mm\\:ss}");
-        Console.WriteLine($"Valor total: R$ {valor:F2}");
+        relatorioService.ExibirTicket(ticket);
     }
 
     public void ListarVeiculos()
@@ -72,7 +85,9 @@ public class EstacionamentoService
             return;
         }
 
-        Console.WriteLine("\n==== VEÍCULOS ESTACIONADOS ====\n");
+        Console.WriteLine();
+        Console.WriteLine("===== VEÍCULOS ESTACIONADOS =====");
+        Console.WriteLine();
 
         foreach (Veiculo veiculo in veiculos)
         {
@@ -83,6 +98,8 @@ public class EstacionamentoService
             Console.WriteLine($"Tempo   : {tempo:hh\\:mm\\:ss}");
             Console.WriteLine("--------------------------------");
         }
+
+        relatorioService.ExibirQuantidade(veiculos);
     }
 
     private Veiculo? BuscarVeiculo(string placa)

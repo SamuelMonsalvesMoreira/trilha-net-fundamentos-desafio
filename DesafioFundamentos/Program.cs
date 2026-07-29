@@ -9,7 +9,15 @@ decimal precoHora = ConsoleHelper.LerDecimal("Preço por hora: ");
 
 Estacionamento estacionamento = new(precoInicial, precoHora);
 
-EstacionamentoService service = new(estacionamento);
+PagamentoService pagamentoService = new();
+TicketService ticketService = new();
+RelatorioService relatorioService = new();
+
+EstacionamentoService service = new(
+    estacionamento,
+    pagamentoService,
+    ticketService,
+    relatorioService);
 
 bool executar = true;
 
@@ -47,7 +55,7 @@ while (executar)
 
 Console.WriteLine("\nPrograma encerrado!");
 
-void ExibirMenu()
+static void ExibirMenu()
 {
     Console.Clear();
 
