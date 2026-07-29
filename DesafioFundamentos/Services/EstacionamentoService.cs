@@ -1,3 +1,4 @@
+using DesafioFundamentos.Interfaces;
 using DesafioFundamentos.Models.Estacionamento;
 using DesafioFundamentos.Models.Veiculos;
 using DesafioFundamentos.Utils;
@@ -7,55 +8,55 @@ namespace DesafioFundamentos.Services;
 public class EstacionamentoService
 {
     private readonly Estacionamento estacionamento;
-    private readonly List<Veiculo> veiculos;
+    private readonly IVeiculoRepository repositorio;
+    private readonly IPagamentoService pagamentoService;
+    private readonly ITicketService ticketService;
+    private readonly IRelatorioService relatorioService;
 
-    private readonly PagamentoService pagamentoService;
-    private readonly TicketService ticketService;
-    private readonly RelatorioService relatorioService;
-
-   public EstacionamentoService(
-    Estacionamento estacionamento,
-    PagamentoService pagamentoService,
-    TicketService ticketService,
-    RelatorioService relatorioService)
-{
-    this.estacionamento = estacionamento;
-    this.pagamentoService = pagamentoService;
-    this.ticketService = ticketService;
-    this.relatorioService = relatorioService;
-
-    veiculos = new List<Veiculo>();
-}
+    public EstacionamentoService(
+        Estacionamento estacionamento,
+        IVeiculoRepository repositorio,
+        IPagamentoService pagamentoService,
+        ITicketService ticketService,
+        IRelatorioService relatorioService)
+    {
+        this.estacionamento = estacionamento;
+        this.repositorio = repositorio;
+        this.pagamentoService = pagamentoService;
+        this.ticketService = ticketService;
+        this.relatorioService = relatorioService;
+    }
 
     public void AdicionarVeiculo()
     {
-        string placa = ConsoleHelper.LerTexto("Digite a placa: ").ToUpper();
+        string placa = ConsoleHelper
+            .LerTexto("Digite a placa: ")
+            .ToUpper();
 
-        if (veiculos.Any(v => v.Placa == placa))
+        if (repositorio.Existe(placa))
         {
-            Console.WriteLine("Este veículo já está estacionado.");
+            relatorioService.ExibirVeiculoDuplicado();
             return;
         }
 
         Veiculo veiculo = new Veiculo(placa);
 
-        veiculos.Add(veiculo);
+        repositorio.Adicionar(veiculo);
 
-        Console.WriteLine();
-        Console.WriteLine("Veículo cadastrado com sucesso!");
-        Console.WriteLine($"Placa   : {veiculo.Placa}");
-        Console.WriteLine($"Entrada : {veiculo.Entrada:dd/MM/yyyy HH:mm:ss}");
+        relatorioService.ExibirVeiculoCadastrado(veiculo);
     }
 
     public void RemoverVeiculo()
     {
-        string placa = ConsoleHelper.LerTexto("Digite a placa: ").ToUpper();
+        string placa = ConsoleHelper
+            .LerTexto("Digite a placa: ")
+            .ToUpper();
 
-        Veiculo? veiculo = BuscarVeiculo(placa);
+        Veiculo? veiculo = repositorio.BuscarPorPlaca(placa);
 
-        if (veiculo == null)
+        if (veiculo is null)
         {
-            Console.WriteLine("Veículo não encontrado.");
+            relatorioService.ExibirVeiculoNaoEncontrado();
             return;
         }
 
@@ -64,47 +65,20 @@ public class EstacionamentoService
             estacionamento.PrecoHora,
             veiculo.Entrada);
 
-        DateTime saida = DateTime.Now;
-
         Ticket ticket = ticketService.GerarTicket(
             veiculo.Placa,
             veiculo.Entrada,
-            saida,
+            DateTime.Now,
             valor);
 
-        veiculos.Remove(veiculo);
+        repositorio.Remover(veiculo);
 
         relatorioService.ExibirTicket(ticket);
     }
 
     public void ListarVeiculos()
     {
-        if (!veiculos.Any())
-        {
-            Console.WriteLine("Nenhum veículo estacionado.");
-            return;
-        }
-
-        Console.WriteLine();
-        Console.WriteLine("===== VEÍCULOS ESTACIONADOS =====");
-        Console.WriteLine();
-
-        foreach (Veiculo veiculo in veiculos)
-        {
-            TimeSpan tempo = DateTime.Now - veiculo.Entrada;
-
-            Console.WriteLine($"Placa   : {veiculo.Placa}");
-            Console.WriteLine($"Entrada : {veiculo.Entrada:dd/MM/yyyy HH:mm:ss}");
-            Console.WriteLine($"Tempo   : {tempo:hh\\:mm\\:ss}");
-            Console.WriteLine("--------------------------------");
-        }
-
-        relatorioService.ExibirQuantidade(veiculos);
-    }
-
-    private Veiculo? BuscarVeiculo(string placa)
-    {
-        return veiculos.FirstOrDefault(v =>
-            v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
+        relatorioService.ExibirListaVeiculos(
+            repositorio.Listar());
     }
 }

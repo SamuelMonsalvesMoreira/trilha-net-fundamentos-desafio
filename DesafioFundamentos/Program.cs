@@ -1,6 +1,7 @@
 ﻿using DesafioFundamentos.Models.Estacionamento;
 using DesafioFundamentos.Services;
 using DesafioFundamentos.Utils;
+using DesafioFundamentos.Repositories;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -9,16 +10,18 @@ decimal precoHora = ConsoleHelper.LerDecimal("Preço por hora: ");
 
 Estacionamento estacionamento = new(precoInicial, precoHora);
 
+VeiculoRepository repositorio = new();
+
 PagamentoService pagamentoService = new();
 TicketService ticketService = new();
 RelatorioService relatorioService = new();
 
 EstacionamentoService service = new(
     estacionamento,
+    repositorio,
     pagamentoService,
     ticketService,
     relatorioService);
-
 bool executar = true;
 
 while (executar)

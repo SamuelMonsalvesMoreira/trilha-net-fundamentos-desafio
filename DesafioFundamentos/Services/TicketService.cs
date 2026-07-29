@@ -1,8 +1,9 @@
+using DesafioFundamentos.Interfaces;
 using DesafioFundamentos.Models.Estacionamento;
 
 namespace DesafioFundamentos.Services;
 
-public class TicketService
+public class TicketService : ITicketService
 {
     private int numeroTicket = 1;
 

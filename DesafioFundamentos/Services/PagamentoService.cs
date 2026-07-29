@@ -1,10 +1,13 @@
+using DesafioFundamentos.Interfaces;
+
 namespace DesafioFundamentos.Services;
 
-public class PagamentoService
+public class PagamentoService : IPagamentoService
 {
-    public decimal CalcularValor(decimal precoInicial,
-                                 decimal precoHora,
-                                 DateTime entrada)
+    public decimal CalcularValor(
+        decimal precoInicial,
+        decimal precoHora,
+        DateTime entrada)
     {
         TimeSpan permanencia = DateTime.Now - entrada;
 
