@@ -11,9 +11,10 @@ decimal precoHora = ConsoleHelper.LerDecimal("Preço por hora: ");
 Estacionamento estacionamento = new(precoInicial, precoHora);
 
 VeiculoRepository repositorio = new();
+TicketRepository ticketRepository = new(); 
 
 PagamentoService pagamentoService = new();
-TicketService ticketService = new();
+TicketService ticketService = new(ticketRepository);
 RelatorioService relatorioService = new();
 
 EstacionamentoService service = new(
@@ -21,7 +22,9 @@ EstacionamentoService service = new(
     repositorio,
     pagamentoService,
     ticketService,
-    relatorioService);
+    relatorioService,
+    ticketRepository); 
+
 bool executar = true;
 
 while (executar)

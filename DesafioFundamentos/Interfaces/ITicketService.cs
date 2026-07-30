@@ -1,6 +1,6 @@
 using DesafioFundamentos.Models.Estacionamento;
 
-namespace DesafioFundamentos.Interfaces;
+namespace DesafioFundamentos.Interfaces; 
 
 public interface ITicketService
 {
@@ -8,5 +8,5 @@ public interface ITicketService
         string placa,
         DateTime entrada,
         DateTime saida,
-        decimal valor);
+        decimal valorPago);
 }

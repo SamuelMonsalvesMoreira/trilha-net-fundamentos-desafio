@@ -43,11 +43,12 @@ public class RelatorioService : IRelatorioService
     {
         if (!veiculos.Any())
         {
-            Console.WriteLine("Nenhum veículo estacionado.");
+            Console.WriteLine("\nNenhum veículo estacionado.");
             return;
         }
 
-        Console.WriteLine("\n==== VEÍCULOS ESTACIONADOS ====\n");
+        // Exibe o título com o total UMA VEZ antes de iterar os veículos
+        Console.WriteLine($"\n==== VEÍCULOS ESTACIONADOS (Total: {veiculos.Count}) ====\n");
 
         foreach (Veiculo veiculo in veiculos)
         {

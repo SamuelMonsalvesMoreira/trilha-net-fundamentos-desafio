@@ -2,16 +2,14 @@ namespace DesafioFundamentos.Persistence;
 
 public class FileManager
 {
-    public bool Existe(string caminho)
+    public void GarantirArquivo(string caminho)
     {
-        return File.Exists(caminho);
-    }
+        string? pasta = Path.GetDirectoryName(caminho);
 
-    public void CriarSeNaoExistir(string caminho)
-    {
+        if (!Directory.Exists(pasta))
+            Directory.CreateDirectory(pasta!);
+
         if (!File.Exists(caminho))
-        {
             File.WriteAllText(caminho, "[]");
-        }
     }
 }

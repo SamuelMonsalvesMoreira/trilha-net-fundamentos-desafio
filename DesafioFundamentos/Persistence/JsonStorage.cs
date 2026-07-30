@@ -19,11 +19,14 @@ public class JsonStorage
     public List<T> Carregar<T>(string caminho)
     {
         if (!File.Exists(caminho))
-            return new();
+            return new List<T>();
 
         string json = File.ReadAllText(caminho);
 
+        if (string.IsNullOrWhiteSpace(json))
+            return new List<T>();
+
         return JsonSerializer.Deserialize<List<T>>(json)
-               ?? new();
+               ?? new List<T>();
     }
 }

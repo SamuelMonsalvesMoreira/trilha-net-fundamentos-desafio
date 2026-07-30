@@ -7,17 +7,18 @@ namespace DesafioFundamentos.Configuration;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(
-        this IServiceCollection services)
+    public static ServiceProvider Configurar()
     {
+        ServiceCollection services = new();
+
+        // Repositórios
         services.AddSingleton<IVeiculoRepository, VeiculoRepository>();
 
+        // Serviços
         services.AddSingleton<IPagamentoService, PagamentoService>();
-
         services.AddSingleton<ITicketService, TicketService>();
-
         services.AddSingleton<IRelatorioService, RelatorioService>();
 
-        return services;
+        return services.BuildServiceProvider();
     }
 }
